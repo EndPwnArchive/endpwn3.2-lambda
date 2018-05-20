@@ -166,8 +166,8 @@
 
                         // get files 
                         fs.writeFileSync(data + '/crxpwn/payload.js', await (await fetch(approot + '/crxpwn.js?_=' + Date.now())).text());
-                        fs.writeFileSync(data + '/epapi.js', await (await fetch('https://endpwn.github.io/epapi/epapi.js?_=' + Date.now())).text());
-                        fs.writeFileSync(data + '/crispr.js', await (await fetch('https://endpwn.github.io/crispr/crispr.js?_=' + Date.now())).text());
+                        fs.writeFileSync(data + '/epapi.js', await (await fetch(approot + '/epapi/epapi.js?_=' + Date.now())).text());
+                        fs.writeFileSync(data + '/crispr.js', await (await fetch(approot + '/crispr/crispr.js?_=' + Date.now())).text());
                         fs.writeFileSync(data + '/plugins/system.js', await (await fetch(approot + '/plugin/system.js?_=' + Date.now())).text());
                         fs.writeFileSync(data + '/plugins/customizer.js', await (await fetch(approot + '/plugin/customizer.js?_=' + Date.now())).text());
                         fs.writeFileSync(data + '/plugins/settings.js', await (await fetch(approot + '/plugin/settings.js?_=' + Date.now())).text());
