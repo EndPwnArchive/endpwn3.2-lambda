@@ -117,16 +117,21 @@ exports = {
 
     },
 
-    replacements: {
+    manifest: {
+        replacements: [
+            // changelog injection
+            {
+                signature:'key:"changeLog",get:function(){return E}',
+                payload:'key:"changeLog",get:function(){if(!E.injected){E.injected=1;E.date=E.date<=window.endpwn.changelog.date?window.endpwn.changelog.date:E.date;E.body=window.endpwn.changelog.body+"\\n\\n"+E.body}return E}'
+            },
 
-        // changelog injection
-        'key:"changeLog",get:function(){return E}':
-            'key:"changeLog",get:function(){if(!E.injected){E.injected=1;E.date=E.date<=window.endpwn.changelog.date?window.endpwn.changelog.date:E.date;E.body=window.endpwn.changelog.body+"\\n\\n"+E.body}return E}',
-
-        // crash screen hijack
-        'var e=o("div",{},void 0,o("p",{},void 0,a.default.Messages.ERRORS_UNEXPECTED_CRASH),o("p",{},void 0,a.default.Messages.ERRORS_ACTION_TO_TAKE)),t=o(c.default,{size:l.ButtonSizes.LARGE,onClick:this._handleSubmitReport},void 0,a.default.Messages.ERRORS_RELOAD);return o(u.default,{theme:this.props.theme,title:a.default.Messages.UNSUPPORTED_BROWSER_TITLE,':
-            `var e=o("div",{},void 0,o("p",{},void 0,"Something has gone very, very wrong, and Discord has crashed."),o("p",{},void 0,"If this is the first time you've seen this error screen, reload and hope for the best. If this screen appears again, follow these steps:"),o("p",{},void 0,"Try removing any new plugins and restarting again. If this solves the problem there may be a bug in a plugin or a conflict."),o("p",{},void 0,"If problems continue, it's likely that there is a bug in EndPwn or Discord."),o("p",{},void 0,"If you need help, join the EndPwn Discord server (https://discord.gg/wXdPNf2)"),o("p",{},void 0,"Details may be available in the console (Ctrl+Shift+I), but at this level of crash we can't be certain.")),t=o("div",{},void 0,o(c.default,{size:l.ButtonSizes.LARGE,onClick:()=>window.electron.getCurrentWindow().reload()},void 0,"Reload"),o(c.default,{size:l.ButtonSizes.LARGE,onClick:()=>{window.$api.localStorage.set('safemode',1);window.electron.getCurrentWindow().reload()}},void 0,"Reload in safe mode"));return o(u.default,{theme:this.props.theme,title:"Discord: Fatal Error",`
-
+            // crash screen hijack
+            {
+                signature:'var e=o("div",{},void 0,o("p",{},void 0,a.default.Messages.ERRORS_UNEXPECTED_CRASH),o("p",{},void 0,a.default.Messages.ERRORS_ACTION_TO_TAKE)),t=o(c.default,{size:l.ButtonSizes.LARGE,onClick:this._handleSubmitReport},void 0,a.default.Messages.ERRORS_RELOAD);return o(u.default,{theme:this.props.theme,title:a.default.Messages.UNSUPPORTED_BROWSER_TITLE,',
+                payload:`var e=o("div",{},void 0,o("p",{},void 0,"Something has gone very, very wrong, and Discord has crashed."),o("p",{},void 0,"If this is the first time you've seen this error screen, reload and hope for the best. If this screen appears again, follow these steps:"),o("p",{},void 0,"Try removing any new plugins and restarting again. If this solves the problem there may be a bug in a plugin or a conflict."),o("p",{},void 0,"If problems continue, it's likely that there is a bug in EndPwn or Discord."),o("p",{},void 0,"If you need help, join the EndPwn Discord server (https://discord.gg/wXdPNf2)"),o("p",{},void 0,"Details may be available in the console (Ctrl+Shift+I), but at this level of crash we can't be certain.")),t=o("div",{},void 0,o(c.default,{size:l.ButtonSizes.LARGE,onClick:()=>window.electron.getCurrentWindow().reload()},void 0,"Reload"),o(c.default,{size:l.ButtonSizes.LARGE,onClick:()=>{window.$api.localStorage.set('safemode',1);window.electron.getCurrentWindow().reload()}},void 0,"Reload in safe mode"));return o(u.default,{theme:this.props.theme,title:"Discord: Fatal Error",`
+            }
+        ],
+        priority: 9999
     },
 
     start: function () {

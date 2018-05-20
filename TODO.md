@@ -2,7 +2,7 @@
 - Nothing yet.
 
 # EPAPI
-- [ ] Native settingsapi
+- [x] Native settingsapi
 
 # CRISPR
 - [ ] Plugin loading changes

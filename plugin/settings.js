@@ -25,7 +25,8 @@ exports = {
         description: "Hijacking the settings pages.",
         replacements: [
             {signature:'/function z\\(\\){return\\[{(.+)}]}/',payload:'window.$settingsapi={sections:[{$1}]};function z(){return window.$settingsapi.sections;}'}
-        ]
+        ],
+        loadAfter: ["system"]
     },
 
     init: function () {
@@ -36,6 +37,7 @@ exports = {
         var checkboxes = $api.util.findFuncExports('checkboxEnabled');
         var misc = $api.util.findFuncExports('statusRed-', 'inputDefault');
         var misc2 = $api.util.findFuncExports('multiInputField');
+        var misc3 = $api.util.findFuncExports('formText-','formText');
         var headers = $api.util.findFuncExports('h5-', 'h5');
         var dividers = wc.findFunc('divider-')[0].exports;
 
@@ -203,6 +205,7 @@ exports = {
                     checkboxes:checkboxes,
                     misc:misc,
                     misc2:misc2,
+                    misc3:misc3,
                     headers:headers,
                     dividers:dividers
                 }

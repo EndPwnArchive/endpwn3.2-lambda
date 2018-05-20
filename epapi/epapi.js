@@ -296,11 +296,14 @@ function evaluate(str, exportsR) {
                     wc.findFunc("clyde")[0].exports.BOT_AVATARS.EndPwn = "https://cdn.discordapp.com/avatars/350987786037493773/ae0a2f95898cfd867c843c1290e2b917.png";
 
                     // dont try loading plugins in lite mode
+                    window.$pluginStore = {};
+
+                    var loadOrder = {};
+
                     if (internal.lite) {
 
                     }
                     else {
-
                         // load styles
                         if (fs.existsSync(exports.data + '/styles')) {
                             fs.readdirSync(exports.data + '/styles').forEach(x => {
@@ -318,8 +321,48 @@ function evaluate(str, exportsR) {
                         if (fs.existsSync(exports.data + '/plugins')) {
                             fs.readdirSync(exports.data + '/plugins').forEach(x => {
                                 if (x.endsWith('.js')) {
+                                    var plugin = krequire(x);
+                                    $pluginStore[x.replace(".js","")] = plugin.manifest ? plugin.manifest : {name:x.replace(".js",""),description:"Manifest is missing for this plugin.",author:"Unknown"};
+                                    loadOrder[x.replace(".js","")] = loadOrder[x.replace(".js","")] ? loadOrder[x.replace(".js","")] : ((plugin.manifest && plugin.manifest.prioirty) ? plugin.manifest.prioirty : 0);
+                                    if(plugin.manifest && plugin.manifest.loadAfter){
+                                        let la = plugin.manifest.loadAfter;
+                                        if(Array.isArray(la)){
+                                            internal.print('/plugins/' + x + ' depends on: ' + la.join(", "));
+                                            la.forEach(y=>{loadOrder[y] ? loadOrder[y]=loadOrder[y]+1 : loadOrder[y] = 1});
+                                        }else{
+                                            internal.print('/plugins/' + x + '\'s loadAfter is not an array, ignoring...');
+                                        }
+                                    }
+                                }
+                            });
+                        }
+
+                        loadOrder = Object.keys(loadOrder).sort(function(a,b){return -(loadOrder[a] - loadOrder[b])});
+
+                        loadOrder.forEach(x=>{
+                            try {
+                                var plugin = krequire(x+".js");
+
+                                if (plugin.start !== undefined) {
+                                    internal.print('loading /plugins/' + x);
+                                    plugin.start();
+                                } else {
+                                    internal.print('/plugins/' + x + ' does not export start(), ignoring...');
+                                }
+                            }
+                            catch (e) {
+                                internal.error(e, x + ' failed to initialize properly');
+                                warning++;
+                            }
+                        });
+
+                        /*if (fs.existsSync(exports.data + '/plugins')) {
+                            fs.readdirSync(exports.data + '/plugins').forEach(x => {
+                                if (x.endsWith('.js')) {
                                     try {
                                         var plugin = krequire(x);
+                                        $pluginStore[x.replace(".js","")] = plugin.manifest ? plugin.manifest : {name:x.replace(".js",""),description:"Manifest is missing for this plugin.",author:"Unknown"};
+
                                         if (plugin.start !== undefined) {
                                             internal.print('loading /plugins/' + x);
                                             plugin.start();
@@ -333,7 +376,7 @@ function evaluate(str, exportsR) {
                                     }
                                 }
                             });
-                        }
+                        }*/
 
                         // execute autoruns...
                         if (fs.existsSync(exports.data + '/autorun')) {
