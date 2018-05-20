@@ -164,9 +164,13 @@ function evaluate(str, exportsR) {
                 return exports;
             }
 
-            // this part sets up webcrack, which is a very important part of EPAPI -- credit to bootsy
+            // this part sets up webcrack, which is a very important part of EPAPI
+            // created by bootsy, fixed for new webpack by dr1ft
             internal.print('initializing webcrack...');
-            webpackJsonp([1e3], { webcrack_ver01_xyzzy: function (n, b, d) { mArr = d.m, mCac = d.c, mCar = [], Object.keys(mCac).forEach(function (n) { mCar[n] = mCac[n] }), findFunc = function (n) { results = []; if ("string" == typeof n) mArr.forEach(function (r, t) { -1 !== r.toString().indexOf(n) && results.push(mCac[t]) }); else { if ("function" != typeof n) throw new TypeError("findFunc can only find via string and function, " + typeof n + " was passed"); mArr.forEach(function (r, e) { n(r) && results.push(mCac[e]) }) } return results }, findCache = function (n) { if (results = [], "function" == typeof n) mCar.forEach(function (r, t) { n(r) && results.push(r) }); else { if ("string" != typeof n) throw new TypeError("findCache can only find via function or string, " + typeof n + " was passed"); mCar.forEach(function (r, t) { if ("object" == typeof r.exports) for (p in r.exports) if (p == n && results.push(r), "default" == p && "object" == typeof r.exports["default"]) for (p in r.exports["default"]) p == n && results.push(r) }) } return results }, window.wc = { get: d, modArr: mArr, modCache: mCac, modCArr: mCar, findFunc: findFunc, findCache: findCache } } }); webpackJsonp([1e3], "", ["webcrack_ver01_xyzzy"]);
+            function webcrack(n, b, d) { mArr = d.m, mCac = d.c, mCar = [], Object.keys(mCac).forEach(function (n) { mCar[n] = mCac[n] }), findFunc = function (n) { results = []; if ("string" == typeof n) mArr.forEach(function (r, t) { -1 !== r.toString().indexOf(n) && results.push(mCac[t]) }); else { if ("function" != typeof n) throw new TypeError("findFunc can only find via string and function, " + typeof n + " was passed"); mArr.forEach(function (r, e) { n(r) && results.push(mCac[e]) }) } return results }, findCache = function (n) { if (results = [], "function" == typeof n) mCar.forEach(function (r, t) { n(r) && results.push(r) }); else { if ("string" != typeof n) throw new TypeError("findCache can only find via function or string, " + typeof n + " was passed"); mCar.forEach(function (r, t) { if ("object" == typeof r.exports) for (p in r.exports) if (p == n && results.push(r), "default" == p && "object" == typeof r.exports["default"]) for (p in r.exports["default"]) p == n && results.push(r) }) } return results }, window.wc = { get: d, modArr: mArr, modCache: mCac, modCArr: mCar, findFunc: findFunc, findCache: findCache } }
+            typeof webpackJsonp == 'function' ?
+                webpackJsonp([1e3], { webcrack: webcrack }, ['webcrack']) :
+                webpackJsonp.push([[1e3], { webcrack: webcrack }, [['webcrack']]]);
 
             internal.print('defining helper functions...');
 
@@ -438,15 +442,6 @@ https://discord.gg/8k3gEeE`,
             please do not call this method unless you are a bootstrap
 
         */
-
-        bootstrap: {
-            name: "Cλnergy (Cynergy2, codename lambda)",
-            version: "[Σv3.1.1, λv1]",
-            method: "lambda",
-            lite:false,
-            silent:false,
-            brand:false
-        },
 
         go: async function (bootstrap, silent, brand, lite) {
 
