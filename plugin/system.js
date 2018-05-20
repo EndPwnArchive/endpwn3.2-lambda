@@ -20,7 +20,7 @@
 var internal = {
 
     print: function (str) {
-        console.log(`%c[EndPwn3]%c ` + str, 'font-weight:bold;color:#0cc', '');
+        console.log(`%c[EndPwn3]%c ` + str, 'font-weight:bold;color:#c8f', '');
     }
 
 }
@@ -90,7 +90,7 @@ exports = {
 
         // fetch the changelog
         internal.print('retrieving changelog...');
-        fetch('https://endpwn.github.io/changelog.md?_=' + Date.now()).then(r => r.text()).then(l => {
+        fetch('https://lambda.cynfoxwell.cf/changelog.md?_=' + Date.now()).then(r => r.text()).then(l => {
             var data = l.split(';;');
             window.endpwn.changelog = {
                 date: data[0],
