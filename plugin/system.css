@@ -38,7 +38,7 @@
 /* settings page stuff */
 
 .epSettingsHeader {
-    background: linear-gradient(to bottom right, #cf8, #c8f);
+    background: linear-gradient(to bottom right, #c8f, #cf8);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     font-size: 36px;

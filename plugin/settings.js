@@ -37,6 +37,7 @@ exports = {
         var misc = $api.util.findFuncExports('statusRed-', 'inputDefault');
         var misc2 = $api.util.findFuncExports('multiInputField');
         var headers = $api.util.findFuncExports('h5-', 'h5');
+        var dividers = wc.findFunc('divider-')[0].exports;
 
         var panels = wc.findFunc('flexChild-')[0].exports;
         var panels2 = $api.util.findFuncExports('errorMessage-', 'inputWrapper');
@@ -202,7 +203,8 @@ exports = {
                     checkboxes:checkboxes,
                     misc:misc,
                     misc2:misc2,
-                    headers:headers
+                    headers:headers,
+                    dividers:dividers
                 }
             }
         }
@@ -303,6 +305,7 @@ exports = {
         }
 
         function renderSettings(pane) {
+            var em = $settingsapi.elements;
             var needAuth = !$api.localStorage.get('customizer_signature');
 
             var content = createElement('div')
@@ -315,10 +318,32 @@ exports = {
             )
             .appendTo(pane);
 
+            em.createH2("Basic Settings")
+            .modify(x=>x.className = x.className.replace("epMargin","margin-bottom-20"))
+            .appendTo(content);
+            createElement("div")
+            .withClass(em.internal.panels.horizontal, 'epButtonPanel')
+            .withChildren(
+                em.createButton("Open Data Folder")
+                .modify(x => x.onclick = () => { electron.shell.openExternal($api.data) }),
+                em.createWarnButton("Restart in safe mode")
+                .modify(x => x.onclick = endpwn.safemode),
+                em.createDangerButton("Uninstall EndPwn")
+                .modify(x => x.onclick = endpwn.uninstall)
+            )
+            .appendTo(content);
+
+            createElement("div")
+            .withClass(em.internal.dividers.divider,"margin-bottom-40","margin-top-40")
+            .appendTo(content);
+
+            em.createH2("Customizer")
+            .modify(x=>x.className = x.className.replace("epMargin","margin-bottom-20"))
+            .appendTo(content);
             if (!$api.localStorage.get('customizer_signature')) {
-                createHorizontalPanel()
+                em.createHorizontalPanel()
                 .withChildren(
-                    createButton("Authorize EndPwn Customizer")
+                    em.createButton("Authorize EndPwn Customizer")
                     .modify(x => x.onclick = authorizeCustomizer)
                 )
                 .appendTo(content);
@@ -326,39 +351,29 @@ exports = {
             else {
                 var discrim, bot;
 
-                createVerticalPanel()
+                em.createVerticalPanel()
                 .withChildren(
-                    createH5('Discriminator'),
-                    createHorizontalPanel()
+                    em.createH5('Discriminator'),
+                    em.createHorizontalPanel()
                     .withChildren(
-                        discrim = createInput(endpwn.customizer.me.discrim ? endpwn.customizer.me.discrim : '')
-                            .withClass('epDiscrimField')
-                            .modify(x => x.maxLength = 4),
-                        createVerticalPanel()
-                            .withChildren(
-                                createH5('Bot?'),
-                                bot = createSwitch(() => { }, endpwn.customizer.me.bot)
-                            ),
-                        createButton("Submit")
-                            .modify(x => x.onclick = () => submitCustomizer(discrim.value, bot.children[0].checked))
+                        discrim = em.createInput(endpwn.customizer.me.discrim ? endpwn.customizer.me.discrim : '')
+                        .withClass('epDiscrimField')
+                        .modify(x => x.maxLength = 4),
+                        em.createVerticalPanel()
+                        .withChildren(
+                            em.createH5('Bot?'),
+                            bot = em.createSwitch(() => { }, endpwn.customizer.me.bot)
+                        ),
+                        em.createButton("Submit")
+                        .modify(x => x.onclick = () => submitCustomizer(discrim.value, bot.children[0].checked))
                     )
                 )
                 .appendTo(content);
             }
-
-            createElement("div")
-            .withClass(panels.horizontal, 'epButtonPanel')
-            .withChildren(
-                createButton("Open Data Folder")
-                    .modify(x => x.onclick = () => { electron.shell.openExternal($api.data) }),
-                createWarnButton("Restart in safe mode")
-                    .modify(x => x.onclick = endpwn.safemode),
-                createDangerButton("Uninstall EndPwn")
-                    .modify(x => x.onclick = endpwn.uninstall)
-            )
-            .appendTo(content);
         }
 
+        $settingsapi.addDivider();
+        $settingsapi.addHeader("Cynergy");
         $settingsapi.addSection("ENDPWN","Cλnergy Settings","#c8f",renderSettings);
     }
 
