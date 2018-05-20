@@ -1,0 +1,63 @@
+<html prefix="og: http://ogp.me/ns#">
+
+<head>
+    <title>C&lambda;nergy</title>
+    <meta property="og:title" content="C&lambda;nergy" />
+    <meta property="og:description" content="Instructions for installing Cynergy" />
+    <meta property="og:image" content="https://endpwn.github.io/sigma.png" />
+
+    <script>
+        function updatePayload() {
+            document.querySelector('code').innerText = `DiscordNative.nativeModules.requireModule("discord_/../electron").remote.getCurrentWindow().loadURL('${location.href}app')`
+        }
+    </script>
+
+    <style>
+        @font-face {
+            font-family: 'IBMVGA8';
+            src: url('https://cynfoxwell.cf/fonts/ibm_vga8.eot');
+            src: url('https://cynfoxwell.cf/fonts/ibm_vga8.eot?#iefix') format('embedded-opentype'),
+                 url('https://cynfoxwell.cf/fonts/ibm_vga8.woff2') format('woff2'),
+                 url('https://cynfoxwell.cf/fonts/ibm_vga8.woff') format('woff'),
+                 url('https://cynfoxwell.cf/fonts/ibm_vga8.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        body {
+            font-family: 'IBMVGA8' !important;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-50%);
+            font-family: sans-serif;
+            text-align: center;
+            background-color: #1a1d23;
+            color: #ffffff
+        }
+
+        a {
+            color: #c0ff80;
+        }
+
+        div {
+            background: linear-gradient(to bottom right, #c0ff80, #c080ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 72px;
+        }
+    </style>
+</head>
+
+<body onload="updatePayload()">
+    <div>C&lambda;nergy</div>
+    Copy and paste the following string into your Discord console:
+    <br>
+    <code>please wait...</code>
+    <br>
+    <br>
+    <b>This is a fork of the unstable, staging branch of EndPwn3. Use at your own risk or use the
+        <a href="https://endpwn.github.io/endpwn3/">stable EP3 branch</a> instead.</b>
+</body>
+
+</html>
