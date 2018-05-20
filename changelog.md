@@ -1,7 +1,6 @@
-2018-05-19;;Cynergy {added marginTop}
+2018-05-20;;Cynergy {improved marginTop}
 =====================
 
-* **Welcome to Cynergy2!**
-* Thank you for being interested in the Lamdba Project.
-* **Plans:**
-* Fix crispr and webcrack.
+* Webcrack is fixed! (thanks dr1ft)
+* New dependency/priority based plugin loading.
+* New fancy plugins page, it does nothing yet.

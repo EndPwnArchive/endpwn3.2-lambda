@@ -5,7 +5,7 @@
 - [x] Native settingsapi
 
 # CRISPR
-- [ ] Plugin loading changes
+- [x] Plugin loading changes
 
 # Misc
 - Nothing yet.
