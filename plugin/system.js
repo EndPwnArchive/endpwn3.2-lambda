@@ -150,7 +150,7 @@ exports = {
                 internal.print('checking for EPAPI updates...');
 
                 // fetch the latest build of epapi
-                fetch('https://endpwn.github.io/epapi/epapi.js?_=' + Date.now()).then(x => x.text()).then(x => {
+                fetch('https://lambda.cynfoxwell.cf/epapi/epapi.js?_=' + Date.now()).then(x => x.text()).then(x => {
 
                     // check the version
                     if (kparse(x).version > $api.version) {

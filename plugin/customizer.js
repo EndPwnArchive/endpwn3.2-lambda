@@ -20,7 +20,7 @@
 var internal = {
 
     print: function (str) {
-        console.log(`%c[Customizer]%c ` + str, 'font-weight:bold;color:#0cc', '');
+        console.log(`%c[Customizer]%c ` + str, 'font-weight:bold;color:#c8f', '');
     }
 
 }
