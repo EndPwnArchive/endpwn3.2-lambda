@@ -54,6 +54,13 @@ function evaluate(str, exportsR) {
     var epapi = krequire('epapi.js');
 
     var properties = {
+        name: "Cλnergy",
+        version: "Σv3.1.1, λv1",
+        method: "crxpwn-lambda",
+        brand:false
+    };
+
+    /*{
         name: 'EndPwn3',
         version: {
             major: 3,
@@ -65,7 +72,7 @@ function evaluate(str, exportsR) {
         },
         method: 'crxpwn',
         brand: true
-    };
+    };*/
 
     // call their entrypoints
     crispr.go(properties);

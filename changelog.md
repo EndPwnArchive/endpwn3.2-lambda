@@ -1,4 +1,4 @@
-2018-05-19;;Cλnergy {added marginTop}
+2018-05-19;;Cynergy {added marginTop}
 =====================
 
 * **Welcome to Cynergy2!**
