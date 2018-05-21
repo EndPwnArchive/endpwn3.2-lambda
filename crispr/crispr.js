@@ -101,9 +101,7 @@ function evaluate(str, exportsR) {
                                 });
 
                             }
-
                         }
-
                     },
 
                     pushHookOld: (x, mod, main) => {
@@ -130,7 +128,7 @@ function evaluate(str, exportsR) {
                             crispr.functions.patch(mod);
 
                         // call webpack proper with our modified modules
-                        return x,mod,main;
+                        return mod;
 
                     }
 
@@ -222,7 +220,7 @@ function evaluate(str, exportsR) {
 
                 // setup replacement when discord tries to define webpack
                 set: webpack => {
-                    if (window.webpackJsonp && window.webpackJsonp.patched) return;
+                    if (webpack && webpack.push && webpack.push.patched) return;
                     const push_original = webpack.push;
 
                     //__crprint('something is trying to define webpackJsonp...');
@@ -237,7 +235,7 @@ function evaluate(str, exportsR) {
                             const main = o ? o : e[2];
                             const _ = t ? e : e[0];
 
-                            const {x,patched,z} = window.crispr.functions.pushHookNew(_,modules,main);
+                            const patched = window.crispr.functions.pushHookNew(_,modules,main);
 
                             const args = [_,patched,main];
 
@@ -246,7 +244,7 @@ function evaluate(str, exportsR) {
 
                         webpack.push = newPush;
                         window.crispr.hook = webpack;
-                        webpack.patched = true;
+                        webpack.push.patched = true;
                     }
                 }
             });

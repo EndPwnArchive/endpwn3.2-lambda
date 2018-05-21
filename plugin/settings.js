@@ -71,15 +71,6 @@ exports = {
                 $settingsapi.ourSections.push({section:"HEADER",label:label});
                 $settingsapi.sections.splice($settingsapi.sections.length-4,0,{section:"HEADER",label:label});
             },
-            exportSections: function(){
-                let out = "";
-
-                for(i in $settingsapi._sections){
-                    out = out + convertToText($settingsapi._sections[i]);
-                }
-
-                return out;
-            },
             //All of these allow us to use Discord's elements.
             elements: {
                 createVerticalPanel: function() {
