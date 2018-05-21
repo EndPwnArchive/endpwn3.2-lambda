@@ -24,7 +24,7 @@ exports = {
         name: "Settings Page + Settings API",
         description: "Hijacking the settings pages.",
         replacements: [
-            {signature:'/function z\\(\\){return\\[{(.+)}]}/',payload:'window.$settingsapi={sections:[{$1}]};function z(){return window.$settingsapi.sections;}'}
+            {signature:'/function (.)\\(\\){return\\[{(.+)}]}/',payload:'window.$settingsapi={sections:[{$2}]};function $1(){return window.$settingsapi.sections;}'}
         ],
         loadAfter: ["system"]
     },

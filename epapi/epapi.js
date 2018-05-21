@@ -150,10 +150,13 @@ function evaluate(str, exportsR) {
                 }
 
                 // krequire is a reimplementation of require(), only intended for loading plugins
-                window.krequire = function (p) {
+                /*window.krequire = function (p) {
                     var exports = {};
                     evaluate(fs.readFileSync($api.data + '/plugins/' + p + (p.endsWith('.js') ? '' : '.js'), 'utf8').toString(), exports);
                     return exports;
+                }*/
+                window.krequire = function(p){
+                    return require($api.data + '/plugins/' + p + (p.endsWith('.js') ? '' : '.js')); //200 IQ :bigthink:
                 }
 
             }
