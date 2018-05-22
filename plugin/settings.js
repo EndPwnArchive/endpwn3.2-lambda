@@ -51,7 +51,7 @@ exports = {
             ourSections: [],
             _callbacks: {},
             _panels: {},
-            addSection: function(name,label,color=null,callback){
+            addSection: function(name,label,color=null,callback,pos=null){
                 let data = {};
 
                 data.section = name || `SAPI_${Math.floor(Math.random()*10000)}`;
@@ -60,7 +60,7 @@ exports = {
                 data.element = $api.util.findConstructor('FormSection', 'FormSection').FormSection;
 
                 $settingsapi.ourSections.push(data);
-                $settingsapi.sections.splice($settingsapi.sections.length-4,0,data);
+                $settingsapi.sections.splice(pos ? pos : $settingsapi.sections.length-4,0,data);
                 $settingsapi._callbacks[name] = callback;
             },
             addDivider: function(){
