@@ -40,10 +40,10 @@ else
             replacements: [
 
                 // changelog injection
-                {
+                /*{
                     signature: /key:"changeLog",get:function\(\){return (\w)}/g,
                     payload: 'key:"changeLog",get:function(){if(!$1.injected){$1.injected=1;$1.date=$1.date<=window.endpwn.changelog.date?window.endpwn.changelog.date:$1.date;$1.body=window.endpwn.changelog.body+"\\n\\n"+$1.body}return $1}'
-                },
+                },*/
 
                 // crash screen hijack
                 {
@@ -117,14 +117,14 @@ else
             };
 
             // fetch the changelog
-            internal.print('retrieving changelog...');
+            /*internal.print('retrieving changelog...');
             fetch('https://dr1ft.xyz/ep/changelog.txt?_=' + Date.now()).then(r => r.text()).then(l => {
                 var data = l.split(';;');
                 window.endpwn.changelog = {
                     date: data[0],
                     body: data[1]
                 };
-            });
+            });*/
 
             // early init payload
             document.addEventListener('ep-prepared', () => {
@@ -166,7 +166,7 @@ else
                     internal.print('checking for EPAPI updates...');
 
                     // fetch the latest build of epapi
-                    fetch('https://dr1ft.xyz/ep/epapi.js?_=' + Date.now()).then(x => x.text()).then(x => {
+                    fetch('https://lambda.cynfoxwell.cf/epapi/epapi.js?_=' + Date.now()).then(x => x.text()).then(x => {
 
                         // check the version
                         if (kparse(x).version > $api.version) {
