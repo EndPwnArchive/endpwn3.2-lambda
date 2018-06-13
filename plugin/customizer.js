@@ -20,96 +20,109 @@
 var internal = {
 
     print: function (str) {
-        console.log(`%c[Customizer]%c ` + str, 'font-weight:bold;color:#c8f', '');
+        console.log(`%c[Customizer]%c ` + str, 'font-weight:bold;color:#0cc', '');
     }
 
 }
 
-exports = {
+if (window.$api === undefined && typeof $api != 'undefined') {
+    console.warn('$api is defined, but window.$api is not! assuming we are running under epapi6 and exporting an empty object...');
+    exports = {};
+}
+else
+    exports = {
 
-    replacements: {
+        manifest: {
+            replacements: [
 
-        // fix for custom discrims breaking search
-        //'#([0-9]{4})': 
-        //'#(.{1,4})',
+                // fix for custom discrims breaking search
+                {
+                    signature: '#([0-9]{4})',
+                    payload: '#(.{1,4})'
+                },
 
-        // endpwn dev badges
-        //'return t.hasFlag(H.UserFlags.STAFF)': 
-        //'return t.hasFlag(4096)&&r.push({tooltip:"EndPwn Developer",onClick:function(){return window.open("https://endpwn.github.io/","_blank")},class:"endpwn"}),t.hasFlag(H.UserFlags.STAFF)'
+                // endpwn dev badges
+                {
+                    //signature: 'return t.hasFlag(H.UserFlags.STAFF)',
+                    signature: /return (\w)\.hasFlag\((\w)\.UserFlags\.STAFF\)&&(\w)\.push/g,
+                    //payload: 'return t.hasFlag(4096)&&r.push({tooltip:"EndPwn Developer",onClick:function(){return window.open("https://endpwn.github.io/","_blank")},class:"endpwn"}),t.hasFlag(H.UserFlags.STAFF)'
+                    payload: 'return $1.hasFlag(4096)&&$3.push({tooltip:"EndPwn Developer",onClick:function(){return window.open("https://endpwn.github.io/","_blank")},class:"endpwn"}),t.hasFlag($2.UserFlags.STAFF)&&r.push'
+                }
 
-    },
+            ],
+        },
 
-    // fallback data
-    data: {
-        guilds: [],
-        devs: [],
-        bots: [],
-        users: {}
-    },
+        // fallback data
+        data: {
+            guilds: [],
+            devs: [],
+            bots: [],
+            users: {}
+        },
 
-    get me() {
-        return {
-            bot: exports.data.bots.indexOf($me()) != -1,
-            discrim: exports.data.users[$me()]
+        get me() {
+            return {
+                bot: exports.data.bots.indexOf($me()) != -1,
+                discrim: exports.data.users[$me()]
+            }
+        },
+
+        update: function () {
+            // fetch goodies.json
+            internal.print('fetching data from server...');
+            fetch('https://endpwn.cathoderay.tube/goodies.json?_=' + Date.now())
+                .then(x => x.json())
+                .then(r => endpwn.customizer.data = r);
+        },
+
+        init: function () {
+
+            // prevent doublecalling
+            delete endpwn.customizer.init;
+
+            // apply custom discrims/bot tags/badges/server verif from EndPwn Customizer (endpwn.cathoderay.tube)
+            internal.print('initializing...');
+
+            // refetch customizer stuff every half hour
+            setInterval(endpwn.customizer.update, 1800000);
+            endpwn.customizer.update();
+
+            // add the endpwn dev badge to the class obfuscation table
+            wc.findFunc('profileBadges:"profileBadges')[0].exports['profileBadgeEndpwn'] = 'profileBadgeEndPwn';
+
+            // hook getUser() so we can apply custom discrims/bot tags/badges
+            $api.util.wrapAfter(
+                "wc.findCache('getUser')[0].exports.getUser",
+
+                x => {
+
+                    if (x === undefined || x === null) return;
+
+                    if (endpwn.customizer.data.bots.includes(x.id)) x.bot = true;
+                    if (endpwn.customizer.data.users[x.id] !== undefined) x.discriminator = endpwn.customizer.data.users[x.id];
+                    if (endpwn.customizer.data.devs.includes(x.id)) x.flags += x.flags & 4096 ? 0 : 4096;
+
+                    return x;
+                }
+            );
+
+            // make sure devs' badges actually render
+            $api.events.hook('USER_PROFILE_MODAL_FETCH_SUCCESS', x => { if (endpwn.customizer.data.devs.includes(x.user.id)) x.user.flags += x.user.flags & 4096 ? 0 : 4096; })
+
+            // hook getGuild() so we can verify servers
+            $api.util.wrapAfter(
+                "wc.findCache('getGuild')[0].exports.getGuild",
+
+                x => {
+
+                    if (x === undefined || x === null) return;
+
+                    if (endpwn.customizer.data.guilds.includes(x.id)) x.features.add('VERIFIED');
+
+                    return x;
+                }
+            );
+
         }
-    },
-
-    update: function () {
-        // fetch goodies.json
-        internal.print('fetching data from server...');
-        fetch('https://endpwn.cathoderay.tube/goodies.json?_=' + Date.now())
-            .then(x => x.json())
-            .then(r => endpwn.customizer.data = r);
-    },
-
-    init: function () {
-
-        // prevent doublecalling
-        delete endpwn.customizer.init;
-
-        // apply custom discrims/bot tags/badges/server verif from EndPwn Customizer (endpwn.cathoderay.tube)
-        internal.print('initializing...');
-
-        // refetch customizer stuff every half hour
-        setInterval(endpwn.customizer.update, 1800000);
-        endpwn.customizer.update();
-
-        // add the endpwn dev badge to the class obfuscation table
-        wc.findFunc('profileBadges:"profileBadges')[0].exports['profileBadgeEndpwn'] = 'profileBadgeEndPwn';
-
-        // hook getUser() so we can apply custom discrims/bot tags/badges
-        $api.util.wrapAfter(
-            "wc.findCache('getUser')[0].exports.getUser",
-
-            x => {
-
-                if (x === undefined || x === null) return;
-
-                if (endpwn.customizer.data.bots.includes(x.id)) x.bot = true;
-                if (endpwn.customizer.data.users[x.id] !== undefined) x.discriminator = endpwn.customizer.data.users[x.id];
-                if (endpwn.customizer.data.devs.includes(x.id)) x.flags += x.flags & 4096 ? 0 : 4096;
-
-                return x;
-            }
-        );
-
-        // make sure devs' badges actually render
-        $api.events.hook('USER_PROFILE_MODAL_FETCH_SUCCESS', x => { if (endpwn.customizer.data.devs.includes(x.user.id)) x.user.flags += x.user.flags & 4096 ? 0 : 4096; })
-
-        // hook getGuild() so we can verify servers
-        $api.util.wrapAfter(
-            "wc.findCache('getGuild')[0].exports.getGuild",
-
-            x => {
-
-                if (x === undefined || x === null) return;
-
-                if (endpwn.customizer.data.guilds.includes(x.id)) x.features.add('VERIFIED');
-
-                return x;
-            }
-        );
 
     }
-
-}

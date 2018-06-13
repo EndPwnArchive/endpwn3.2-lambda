@@ -29,17 +29,17 @@ function evaluate(str, exportsR) {
     var internal = {
 
         print: function (t) {
-            console.log(`%c[EPAPI]%c ${t}`, 'font-weight:bold;color:#c8f', '');
+            console.log(`%c[EPAPI]%c ${t}`, 'font-weight:bold;color:#0cc', '');
         },
 
         warn: function (t, e) {
             if (typeof (e) == 'undefined') e = ''; else e = ':\n\n' + e;
-            console.warn(`%c[EPAPI]%c ${t}`, 'font-weight:bold;color:#c8f', '', e);
+            console.warn(`%c[EPAPI]%c ${t}`, 'font-weight:bold;color:#0cc', '', e);
         },
 
         error: function (e, t) {
             if (typeof (t) == 'undefined') t = 'uncaught exception';
-            console.error(`%c[EPAPI]%c ${t}:\n\n`, 'font-weight:bold;color:#c8f', '', e);
+            console.error(`%c[EPAPI]%c ${t}:\n\n`, 'font-weight:bold;color:#0cc', '', e);
         },
 
         alert: function (b, t) {
@@ -116,7 +116,7 @@ function evaluate(str, exportsR) {
         prepare: async function () {
 
             internal.print('loading RapidDOM...');
-            evaluate(await (await fetch('https://endpwn.github.io/rapiddom/rapiddom.js?_=' + Date.now())).text());
+            require("./rapiddom.js");
 
             // undefine config and settings if running in lite mode and dont deal with require()
             if (internal.lite) {
@@ -124,19 +124,23 @@ function evaluate(str, exportsR) {
             }
             else {
 
-                // mutant hybrid require() for maximum compatibility, always defined now because some bootstraps have bad implementations
-                internal.print('defining require...');
-                //if (typeof (require) == "undefined") {
-                var r = DiscordNative.nativeModules.requireModule("discord_/../electron").remote.require;
-                window.require = m => {
-                    try {
-                        return DiscordNative.nativeModules.requireModule("discord_/../" + m);
-                    }
-                    catch (e) {
-                        return r(m);
-                    }
-                };
-                //}
+                // only use the (now defunct) directory escape exploit if the bootstrap hasnt declared itself as native
+                // TODO: once the exploit fix gets pushed out to stable we should probably start assuming native by default
+                if (!internal.native) {
+
+                    // mutant hybrid require() for maximum compatibility, always defined now because some bootstraps have bad implementations
+                    internal.print('defining require...');
+                    var r = DiscordNative.nativeModules.requireModule("discord_/../electron").remote.require;
+                    window.require = m => {
+                        try {
+                            return DiscordNative.nativeModules.requireModule("discord_/../" + m);
+                        }
+                        catch (e) {
+                            return r(m);
+                        }
+                    };
+
+                }
 
                 // here we import and define some stuff that usually gets defined by the bootstrap, just in case
                 internal.print('requiring necessary modules...');
@@ -151,9 +155,10 @@ function evaluate(str, exportsR) {
 
                 // krequire is a reimplementation of require(), only intended for loading plugins
                 window.krequire = function (p) {
-                    var exports = {};
+                    /*var exports = {};
                     evaluate(fs.readFileSync($api.data + '/plugins/' + p + (p.endsWith('.js') ? '' : '.js'), 'utf8').toString(), exports);
-                    return exports;
+                    return exports;*/
+                    return require($api.data + '/plugins/' + p + (p.endsWith('.js') ? '' : '.js'))
                 }
 
             }
@@ -292,14 +297,11 @@ function evaluate(str, exportsR) {
                     wc.findFunc("clyde")[0].exports.BOT_AVATARS.EndPwn = "https://cdn.discordapp.com/avatars/350987786037493773/ae0a2f95898cfd867c843c1290e2b917.png";
 
                     // dont try loading plugins in lite mode
-                    window.$pluginStore = {};
-
-                    var loadOrder = {};
-
                     if (internal.lite) {
 
                     }
                     else {
+
                         // load styles
                         if (fs.existsSync(exports.data + '/styles')) {
                             fs.readdirSync(exports.data + '/styles').forEach(x => {
@@ -317,48 +319,8 @@ function evaluate(str, exportsR) {
                         if (fs.existsSync(exports.data + '/plugins')) {
                             fs.readdirSync(exports.data + '/plugins').forEach(x => {
                                 if (x.endsWith('.js')) {
-                                    var plugin = krequire(x);
-                                    $pluginStore[x.replace(".js","")] = plugin.manifest ? plugin.manifest : {name:x.replace(".js",""),description:"Manifest is missing for this plugin.",author:"Unknown"};
-                                    loadOrder[x.replace(".js","")] = loadOrder[x.replace(".js","")] ? loadOrder[x.replace(".js","")] : ((plugin.manifest && plugin.manifest.prioirty) ? plugin.manifest.prioirty : 0);
-                                    if(plugin.manifest && plugin.manifest.loadAfter){
-                                        let la = plugin.manifest.loadAfter;
-                                        if(Array.isArray(la)){
-                                            internal.print('/plugins/' + x + ' depends on: ' + la.join(", "));
-                                            la.forEach(y=>{loadOrder[y] ? loadOrder[y]=loadOrder[y]+1 : loadOrder[y] = 1});
-                                        }else{
-                                            internal.print('/plugins/' + x + '\'s loadAfter is not an array, ignoring...');
-                                        }
-                                    }
-                                }
-                            });
-                        }
-
-                        loadOrder = Object.keys(loadOrder).sort(function(a,b){return -(loadOrder[a] - loadOrder[b])});
-
-                        loadOrder.forEach(x=>{
-                            try {
-                                var plugin = krequire(x+".js");
-
-                                if (plugin.start !== undefined) {
-                                    internal.print('loading /plugins/' + x);
-                                    plugin.start();
-                                } else {
-                                    internal.print('/plugins/' + x + ' does not export start(), ignoring...');
-                                }
-                            }
-                            catch (e) {
-                                internal.error(e, x + ' failed to initialize properly');
-                                warning++;
-                            }
-                        });
-
-                        /*if (fs.existsSync(exports.data + '/plugins')) {
-                            fs.readdirSync(exports.data + '/plugins').forEach(x => {
-                                if (x.endsWith('.js')) {
                                     try {
                                         var plugin = krequire(x);
-                                        $pluginStore[x.replace(".js","")] = plugin.manifest ? plugin.manifest : {name:x.replace(".js",""),description:"Manifest is missing for this plugin.",author:"Unknown"};
-
                                         if (plugin.start !== undefined) {
                                             internal.print('loading /plugins/' + x);
                                             plugin.start();
@@ -372,7 +334,7 @@ function evaluate(str, exportsR) {
                                     }
                                 }
                             });
-                        }*/
+                        }
 
                         // execute autoruns...
                         if (fs.existsSync(exports.data + '/autorun')) {
@@ -429,7 +391,7 @@ function evaluate(str, exportsR) {
 
             major: 5,
             minor: 6,
-            revision: 43,   // TODO: find a better way of incrementing/calculating the revision; the current way is fucking ridiculous (manually editing)
+            revision: 46,   // TODO: find a better way of incrementing/calculating the revision; the current way is fucking ridiculous (manually editing)
 
             toString: function () {
                 return `v${this.major}.${this.minor}.${this.revision}`;
@@ -449,12 +411,12 @@ function evaluate(str, exportsR) {
                 console.log(`EPAPI ${this.version}\nhttps://endpwn.github.io/\nhttps://discord.gg/8k3gEeE`);
             }
             else
-                console.log(`%cCλnergy%c
+                console.log(`%cΣndPwn%c
 ${this.bootstrap.name ? this.bootstrap.name : 'unknown'}${this.bootstrap.version ? ` ${this.bootstrap.version}` : ''}${this.bootstrap.method ? ` (${this.bootstrap.method})` : ''}
 EPAPI ${this.version}${window.crispr ? `, CRISPR ${window.crispr.version}` : ''}
 https://endpwn.github.io/
-https://discord.gg/8k3gEeE`,
-                    'background:linear-gradient(to bottom right,#cf8,#c8f);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:48px;font-family:sans-serif', '');
+https://patreon.com/dr1ft`,
+                    'background:linear-gradient(to bottom right,#0ff,#f0f);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:48px;font-family:sans-serif', '');
         },
 
         // get the lite status
@@ -463,9 +425,9 @@ https://discord.gg/8k3gEeE`,
         },
 
         /*
-
+        
             entrypoint arguments:
-
+        
                 bootstrap (object): bootstrap properties
                                     keys:
                                         name (string):                  name of bootstrap
@@ -475,19 +437,19 @@ https://discord.gg/8k3gEeE`,
                                         silent (bool):                  dont display about() after initialization
                                         brand (bool):                   enables the sigma wordmark replacement
                                         secure (bool):                  enables security features like permissions
-
+                                        native (bool):                  informs epapi that we have access to native require()
+    
                                     all keys are optional, boolean values are assumed false if not provided
-
+            
             please do not call this method unless you are a bootstrap
-
+        
         */
-
         go: async function (bootstrap, silent, brand, lite) {
 
             if (location.hostname.indexOf('discordapp') == -1 && location.hostname.indexOf('dr1ft.xyz') == -1) return;
 
             try {
-                internal.print('starting up...')
+                internal.print('starting up...');
 
                 // figure out which calling convention is being used
                 switch (typeof bootstrap) {
@@ -498,6 +460,7 @@ https://discord.gg/8k3gEeE`,
                         internal.lite = bootstrap.lite ? true : false;
                         internal.silent = bootstrap.silent ? true : false;
                         internal.brand = bootstrap.brand ? true : false;
+                        internal.native = bootstrap.native ? true : false;
                         break;
 
                     // older bootstrap
@@ -614,7 +577,7 @@ https://discord.gg/8k3gEeE`,
             wrap: function (target1, callback) {
 
                 // for security; we're evaluating an untrusted expression in the local scope here
-                var internal = {};
+                //var internal = {};
 
                 // get the original function
                 var orig = evaluate(target1);
@@ -656,7 +619,7 @@ https://discord.gg/8k3gEeE`,
             // intercept a function's return value
             wrapAfter: function (target1, callback) {
 
-                var internal = {};
+                //var internal = {};
 
                 // get the original function
                 var orig = evaluate(target1);
@@ -672,8 +635,7 @@ https://discord.gg/8k3gEeE`,
                         return callback(r);
                     }
                     catch (e) {
-                        let err = internal && internal.error ? internal.error : console.error;
-                        err(e, 'A function wrapper threw an exception');
+                        internal.error(e, 'A function wrapper threw an exception');
 
                         // again, dont fuck stuff up if there's a flaw in the wrapper
                         return r;
@@ -930,7 +892,7 @@ https://discord.gg/8k3gEeE`,
                 $('.topic').style.display = 'none';
                 $('.header-toolbar').style.display = 'none';
             },
-
+        
             showToolbar: function () {
                 $('.topic').style.display = '';
                 $('.header-toolbar').style.display = '';
@@ -964,5 +926,7 @@ https://discord.gg/8k3gEeE`,
         }
 
     }
+
+    if (typeof module != 'undefined') module.exports = exports;
 
 })();
