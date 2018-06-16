@@ -25,7 +25,7 @@ var internal = {
 
 }
 
-module.exports = {
+exports = {
     manifest: {
         replacements: [
 

@@ -16,7 +16,7 @@
     https://github.com/endpwn/
 
 */
-module.exports = {
+exports = {
     manifest: {
         replacements: [
             {

@@ -28,7 +28,7 @@ var internal = {
 
 }
 
-module.exports = {
+exports = {
     manifest: {
         replacements: [
 
@@ -42,6 +42,12 @@ module.exports = {
             {
                 signature: /var (\w)=(\w)\("div",{},void 0,\w\("p",{},void 0,(\w)\.default\.Messages\.ERRORS_UNEXPECTED_CRASH\),\w\("p",{},void 0,\w\.default\.Messages\.ERRORS_ACTION_TO_TAKE\)\),(\w)=\w\((\w)\.default,{size:(\w)\.ButtonSizes\.LARGE,onClick:this\._handleSubmitReport},void 0,a\.default\.Messages\.ERRORS_RELOAD\);return o\(u\.default,{theme:this\.props.theme,title:a\.default\.Messages\.UNSUPPORTED_BROWSER_TITLE,/g,
                 payload: `var $1=$2("div",{},void 0,$2("p",{},void 0,"Something has gone very, very wrong, and Discord has crashed."),$2("p",{},void 0,"If this is the first time you've seen this error screen, reload and hope for the best. If this screen appears again, follow these steps:"),$2("p",{},void 0,"Try removing any new plugins and restarting again. If this solves the problem there may be a bug in a plugin or a conflict."),$2("p",{},void 0,"If problems continue, it's likely that there is a bug in EndPwn or Discord."),$2("p",{},void 0,"If you need help, join the EndPwn Discord server (https://discord.gg/wXdPNf2)"),$2("p",{},void 0,"Details may be available in the console (Ctrl+Shift+I), but at this level of crash we can't be certain.")),$4=$2("div",{},void 0,$2($5.default,{size:$6.ButtonSizes.LARGE,onClick:()=>window.electron.getCurrentWindow().reload()},void 0,"Reload"),$2($5.default,{size:$6.ButtonSizes.LARGE,onClick:()=>{window.$api.localStorage.set('safemode',1);window.electron.getCurrentWindow().reload()}},void 0,"Reload in safe mode"));return $2(u.default,{theme:this.props.theme,title:"Discord: Fatal Error",`
+            },
+
+            // experiments
+            {
+                signature: "window.GLOBAL_ENV.RELEASE_CHANNEL",
+                payload: "'staging'"
             }
 
         ],
