@@ -545,14 +545,14 @@ function evaluate(str, exportsR) {
         // oh no i made it even uglier
         about: function() {
             console.log(
-                `%Lλmbda%c
+                `%cLλmbda%c
 ${this.bootstrap.name ? this.bootstrap.name : "unknown"}${
                     this.bootstrap.version ? ` ${this.bootstrap.version}` : ""
                 }${this.bootstrap.method ? ` (${this.bootstrap.method})` : ""}
 EPAPI ${this.version}${window.crispr ? `, CRISPR ${window.crispr.version}` : ""}
 https://xn--lmbda-2be.cf/
 https://discord.gg/6dKCZxn`,
-                "background:linear-gradient(to bottom right,#0ff,#f0f);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:48px;font-family:sans-serif",
+                "background:linear-gradient(to bottom right,#c0ff80,#c080ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:48px;font-family:sans-serif",
                 ""
             );
         },
