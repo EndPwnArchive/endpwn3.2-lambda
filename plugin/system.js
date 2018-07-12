@@ -18,20 +18,17 @@
 */
 
 var internal = {
-
-    print: function (str) {
-        console.log(`%c[EndPwn3]%c ` + str, 'font-weight:bold;color:#0cc', '');
+    print: function(str) {
+        console.log(`%c[EndPwn3]%c ` + str, "font-weight:bold;color:#0cc", "");
     },
-    warn: function (str) {
-        console.warn(`%c[EndPwn3]%c ` + str, 'font-weight:bold;color:#0cc', '');
+    warn: function(str) {
+        console.warn(`%c[EndPwn3]%c ` + str, "font-weight:bold;color:#0cc", "");
     }
-
-}
+};
 
 exports = {
     manifest: {
         replacements: [
-
             // changelog injection
             /*{
                 signature: /key:"changeLog",get:function\(\){return (\w)}/g,
@@ -49,69 +46,69 @@ exports = {
                 signature: "window.GLOBAL_ENV.RELEASE_CHANNEL",
                 payload: "'staging'"
             }
-
-        ],
+        ]
     },
 
-    preload: function () {
-        window.reload = () => { app.relaunch(); app.exit(); };
+    preload: function() {
+        window.reload = () => {
+            app.relaunch();
+            app.exit();
+        };
         window.endpwn = {
-
             // safemode
-            safemode: function () {
+            safemode: function() {
                 $api.ui.showDialog({
-                    title: 'EndPwn: safe mode',
-                    body: 'This will restart your client in a state without plugin support.',
-                    confirmText: 'Yes', cancelText: 'No',
+                    title: "EndPwn: safe mode",
+                    body:
+                        "This will restart your client in a state without plugin support.",
+                    confirmText: "Yes",
+                    cancelText: "No",
 
                     onConfirm: () => {
-
-                        $api.localStorage.set('safemode', 1);
+                        $api.localStorage.set("safemode", 1);
                         window.electron.getCurrentWindow().reload();
-
                     }
                 });
             },
 
             // uninstaller
-            uninstall: function () {
+            uninstall: function() {
                 $api.ui.showDialog({
-                    title: 'EndPwn: confirm uninstallation',
-                    body: 'Are you sure you want to remove EndPwn from your client? You can reinstall it at any time.',
-                    confirmText: 'Yes', cancelText: 'No',
+                    title: "EndPwn: confirm uninstallation",
+                    body:
+                        "Are you sure you want to remove EndPwn from your client? You can reinstall it at any time.",
+                    confirmText: "Yes",
+                    cancelText: "No",
 
                     onConfirm: () => {
-
                         var data = $api.data;
 
-                        $api.settings.set('WEBAPP_ENDPOINT');
-                        $api.settings.set('WEBAPP_PATH');
-                        $api.settings.set('UPDATE_ENDPOINT');
+                        $api.settings.set("WEBAPP_ENDPOINT");
+                        $api.settings.set("WEBAPP_PATH");
+                        $api.settings.set("UPDATE_ENDPOINT");
 
                         reload();
-
                     }
                 });
             },
 
             // endpwn customizer
-            customizer: krequire('customizer'),
+            //customizer: krequire('customizer'),
 
             // settings page stuff
-            settings: krequire('settings'),
+            settings: krequire("settings"),
 
             // wrapper function for dispatch()
             // intended to simplify using executeJavaScript() from other windows as a bad IPC method
             // we do this since afaik we cant use electron.ipc in a useful way (maybe im wrong? if i am ill make this better later on lol)
-            pseudoipc: function (e) {
+            pseudoipc: function(e) {
                 $api.events.dispatch({
-                    type: 'ENDPWN_PSEUDO_IPC',
+                    type: "ENDPWN_PSEUDO_IPC",
                     data: e
                 });
             },
 
             __eval: e => eval(e)
-
         };
 
         // fetch the changelog
@@ -125,79 +122,82 @@ exports = {
         });*/
 
         // early init payload
-        document.addEventListener('ep-prepared', () => {
-
+        document.addEventListener("ep-prepared", () => {
             // disable that obnoxious warning about not pasting shit in the console
-            internal.print('disabling self xss warning...');
-            $api.util.findFuncExports('consoleWarning').consoleWarning = e => { };
+            internal.print("disabling self xss warning...");
+            $api.util.findFuncExports(
+                "consoleWarning"
+            ).consoleWarning = e => {};
 
             // fuck sentry
-            internal.print('fucking sentry...');
-            var sentry = wc.findCache('_originalConsoleMethods')[0].exports;
-            window.console = Object.assign(window.console, sentry._originalConsoleMethods); // console
-            sentry._wrappedBuiltIns.forEach(x => x[0][x[1]] = x[2]); // other stuff
-            sentry._breadcrumbEventHandler = () => () => { }; // break most event logging
-            sentry.captureBreadcrumb = () => { }; // disable breadcrumb logging
-
+            internal.print("fucking sentry...");
+            var sentry = wc.findCache("_originalConsoleMethods")[0].exports;
+            window.console = Object.assign(
+                window.console,
+                sentry._originalConsoleMethods
+            ); // console
+            sentry._wrappedBuiltIns.forEach(x => (x[0][x[1]] = x[2])); // other stuff
+            sentry._breadcrumbEventHandler = () => () => {}; // break most event logging
+            sentry.captureBreadcrumb = () => {}; // disable breadcrumb logging
         });
-
     },
 
-    start: function () {
-
+    start: function() {
         // disable analytics
-        internal.print('disabling analytics...');
-        $api.util.findFuncExports("AnalyticEventConfigs").default.track = () => { };
+        internal.print("disabling analytics...");
+        $api.util.findFuncExports(
+            "AnalyticEventConfigs"
+        ).default.track = () => {};
 
         // enable experiments
-        internal.print('enabling experiments menu...');
-        $api.util.findFuncExports('isDeveloper').__defineGetter__('isDeveloper', () => true);
+        internal.print("enabling experiments menu...");
+        $api.util
+            .findFuncExports("isDeveloper")
+            .__defineGetter__("isDeveloper", () => true);
 
         // if we used start() in the other files, it would create a different instance -- we dont want that
         endpwn.customizer.init();
         endpwn.settings.init();
 
         // check for epapi updates
-        if ($api.lite || !fs.existsSync($api.data + '/DONTUPDATE'))
-        (function () {
-            internal.print('checking for EPAPI updates...');
+        if ($api.lite || !fs.existsSync($api.data + "/DONTUPDATE"))
+            (function() {
+                internal.print("checking for EPAPI updates...");
 
-            // fetch the latest build of epapi
-            fetch('https://lambda.cynfoxwell.cf/epapi/epapi.js?_=' + Date.now()).then(x => x.text()).then(x => {
+                // fetch the latest build of epapi
+                fetch(
+                    "https://lambda.cynfoxwell.cf/epapi/epapi.js?_=" +
+                        Date.now()
+                )
+                    .then(x => x.text())
+                    .then(x => {
+                        // check the version
+                        if (kparse(x).version > $api.version) {
+                            // if the version on the server is newer, pester the user
+                            $api.ui.showDialog({
+                                title: "EndPwn3: EPAPI Update Available",
+                                body:
+                                    "An update to EPAPI has been released. It is recommended that you restart your client in order to gain access to new features and maintain compatibility.",
+                                confirmText: "Restart Now",
+                                cancelText: "Later",
 
-                // check the version
-                if (kparse(x).version > $api.version) {
+                                // user pressed "Restart Now"
+                                onConfirm: () => {
+                                    // refresh the page if we're running in a browser, reboot the app if we're running outside of lite mode
+                                    reload();
+                                },
 
-                    // if the version on the server is newer, pester the user
-                    $api.ui.showDialog({
-
-                        title: 'EndPwn3: EPAPI Update Available',
-                        body: 'An update to EPAPI has been released. It is recommended that you restart your client in order to gain access to new features and maintain compatibility.',
-                        confirmText: 'Restart Now', cancelText: 'Later',
-
-                        // user pressed "Restart Now"
-                        onConfirm: () => {
-
-                            // refresh the page if we're running in a browser, reboot the app if we're running outside of lite mode
-                            reload();
-
-                        },
-
-                        // they pressed "Later", for some reason
-                        onCancel: () => {
-
-                            // bother them again in 6 hrs (* 60 min * 60 sec * 1000 ms)
-                            setTimeout(arguments.callee, 6 * 60 * 60 * 1000);
-
-                        }
-
+                                // they pressed "Later", for some reason
+                                onCancel: () => {
+                                    // bother them again in 6 hrs (* 60 min * 60 sec * 1000 ms)
+                                    setTimeout(
+                                        arguments.callee,
+                                        6 * 60 * 60 * 1000
+                                    );
+                                }
+                            });
+                        } else setTimeout(arguments.callee, 6 * 60 * 60 * 1000);
                     });
-
-                }
-                else setTimeout(arguments.callee, 6 * 60 * 60 * 1000);
-
-            });
-
-        })();
+            })();
     }
-}
+};

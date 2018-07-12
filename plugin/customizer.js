@@ -17,7 +17,7 @@
 
 */
 
-var internal = {
+/*var internal = {
 
     print: function (str) {
         console.log(`%c[Customizer]%c ` + str, 'font-weight:bold;color:#0cc', '');
@@ -120,3 +120,4 @@ exports = {
     }
 
 }
+*/
