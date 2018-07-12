@@ -1,6 +1,4 @@
-2018-05-20;;Cynergy {improved marginTop}
-=====================
+# 2018-05-20;;Lambda {improved marginTop}
 
-* Webcrack is fixed! (thanks dr1ft)
-* New dependency/priority based plugin loading.
-* New fancy plugins page, it does nothing yet.
+* Welcome to Lambda Legacy!
+* Major things will eventually be pushed

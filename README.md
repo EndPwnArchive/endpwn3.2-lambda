@@ -1,2 +1,3 @@
-# Cynergy
-A semi-private EndPwn3.1 repo.
+# Lambda Legacy
+
+The EndPwn 3.2 fork version of Lambda.

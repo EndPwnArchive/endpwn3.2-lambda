@@ -29,7 +29,7 @@ if (window.$api === undefined && typeof $api != "undefined") {
                 {
                     signature: /{section:(\w)\.SectionTypes\.DIVIDER},{section:"logout",/g,
                     payload:
-                        '{section:$1.SectionTypes.DIVIDER},{section:"ENDPWN",label:"ΣndPwn Settings",element:window.BlankSettingsElement,color:"#0cc"},{section:$1.SectionTypes.DIVIDER},{section:"logout",'
+                        '{section:$1.SectionTypes.DIVIDER},{section:"ENDPWN",label:"Lλmbda Settings",element:window.BlankSettingsElement,color:"#c080ff"},{section:$1.SectionTypes.DIVIDER},{section:"logout",'
                 }
             ]
         },
@@ -38,12 +38,6 @@ if (window.$api === undefined && typeof $api != "undefined") {
             delete endpwn.settings.init;
 
             var currentSection = "";
-
-            /*$api.events.listen('ENDPWN_PSEUDO_IPC', msg => {
-                $api.localStorage.set('customizer_signature', JSON.parse(msg.data).signature);
-                console.log(currentSection);
-                renderSettings(currentSection);
-            });*/
 
             window.BlankSettingsElement = $api.util.findConstructor(
                 "FormSection",
@@ -197,49 +191,6 @@ if (window.$api === undefined && typeof $api != "undefined") {
                 return w;
             }
 
-            /*function authorizeCustomizer() {
-                var endpoint = $api.internal.constants.API_HOST;
-                var url = `https://${endpoint}/oauth2/authorize?client_id=436715820970803203&redirect_uri=https%3A%2F%2Fendpwn.cathoderay.tube%2Fauth%2Fdiscord%2Fintegratedcallback&response_type=code&scope=identify`;
-
-                var win = new window.electron.BrowserWindow({
-                    width: 420,
-                    height: 500,
-                    transparent: false,
-                    frame: false,
-                    resizable: true,
-                    nodeIntegration: true
-                });
-                win.loadURL(url);
-            }
-
-            function submitCustomizer(d, b) {
-
-                fetch('https://endpwn.cathoderay.tube/set', {
-                    headers: {
-                        'Content-type': 'application/json'
-                    },
-                    method: 'POST',
-                    body: JSON.stringify({
-                        id: $me(),
-                        signature: $api.localStorage.get('customizer_signature'),
-                        discriminator: d,
-                        bot: b
-                    })
-                }).then(r => {
-
-                    r.text().then(k => {
-                        $api.ui.showDialog({
-                            title: 'Server Response',
-                            body: k
-                        });
-                    });
-
-                    endpwn.customizer.update();
-
-                });
-
-            }*/
-
             function renderSettings(e) {
                 currentSection = e;
                 if ($("#ep_settings")) $("#ep_settings").remove();
@@ -248,53 +199,15 @@ if (window.$api === undefined && typeof $api != "undefined") {
                     var pane = $(".content-column.default");
                     if (!pane) return;
 
-                    //var needAuth = !$api.localStorage.get('customizer_signature');
-
                     var content = createElement("div")
                         .withId("ep_settings")
                         .withClass("flex-vertical")
                         .withChildren(
                             createElement("div")
                                 .withClass("epSettingsHeader")
-                                .withText("ΣndPwn Settings")
+                                .withText("Lλmbda Settings")
                         )
                         .appendTo(pane);
-
-                    /*if (!$api.localStorage.get('customizer_signature')) {
-
-                        createHorizontalPanel()
-                            .withChildren(
-                                createButton("Authorize EndPwn Customizer")
-                                    .modify(x => x.onclick = authorizeCustomizer)
-                            )
-                            .appendTo(content);
-
-                    }
-                    else {
-
-                        var discrim, bot;
-
-                        createVerticalPanel()
-                            .withChildren(
-                                createH5('Discriminator'),
-                                createHorizontalPanel()
-                                    .withChildren(
-                                        discrim = createInput(endpwn.customizer.me.discrim ? endpwn.customizer.me.discrim : '')
-                                            .withClass('epDiscrimField')
-                                            .modify(x => x.maxLength = 4),
-                                        createVerticalPanel()
-                                            .withChildren(
-                                                createH5('Bot?'),
-                                                bot = createSwitch(() => { }, endpwn.customizer.me.bot)
-                                            ),
-                                        createButton("Submit")
-                                            .modify(x => x.onclick = () => submitCustomizer(discrim.value, bot.children[0].checked))
-                                    )
-
-                            )
-                            .appendTo(content);
-
-                    }*/
 
                     createElement("div")
                         .withClass(panels.horizontal, "epButtonPanel")
@@ -311,21 +224,14 @@ if (window.$api === undefined && typeof $api != "undefined") {
                             createDangerButton("Uninstall EndPwn").modify(
                                 x => (x.onclick = endpwn.uninstall)
                             )
-                            /*createButton("Toggle Customizer")
-                                .modify(x => x.onclick = function(){
-                                    window.____customizerToggled = !window.____customizerToggled;
-                                    $api.localStorage.set("customizerToggled",window.____customizerToggled);
-                                    const restart = confirm("For toggle to be in full effect, you will need to refresh. Press \"OK\" to refresh or \"Cancel\" to refresh later on your own.");
-                                    if (restart){
-                                        window.electron.getCurrentWindow().reload();
-                                    }
-                                })*/
                         )
                         .appendTo(content);
                 }
             }
 
-            $api.events.hook("USER_SETTINGS_MODAL_SET_SECTION", renderSettings);
+            $api.events.hook("USER_SETTINGS_MODAL_SET_SECTION", e =>
+                setTimeout(_ => renderSettings(e), 200)
+            );
             $api.events.hook("USER_SETTINGS_MODAL_INIT", e =>
                 setTimeout(_ => renderSettings(e), 200)
             );
