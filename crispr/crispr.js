@@ -25,34 +25,48 @@ function evaluate(str, exportsR) {
 }
 
 (() => {
-
     // log function
     function __crprint(str) {
-        console.log(`%c[CRISPR]%c ` + str, 'font-weight:bold;color:#c080ff', '');
+        console.log(
+            `%c[CRISPR]%c ` + str,
+            "font-weight:bold;color:#c080ff",
+            ""
+        );
     }
     function __crwarn(str) {
-        console.warn(`%c[CRISPR]%c ` + str, 'font-weight:bold;color:#c080ff', '');
+        console.warn(
+            `%c[CRISPR]%c ` + str,
+            "font-weight:bold;color:#c080ff",
+            ""
+        );
     }
 
-    exports.go = (() => {
-
+    exports.go = () => {
         window.__crispr_load_attempted = true;
 
-        if (location.hostname.indexOf('discordapp') == -1 && location.hostname.indexOf('dr1ft.xyz') == -1) return;
+        const dataDir = require("electron")
+            .remote.app.getPath("userData")
+            .replace(/\\/g, "/");
+        const settings = require(dataDir + "/settings.json");
+
+        if (
+            location.hostname.indexOf(settings.WEBAPP_ENDPOINT) == -1 &&
+            location.hostname.indexOf("discordapp") == -1 &&
+            location.hostname.indexOf("dr1ft.xyz") == -1
+        )
+            return;
 
         try {
-
-            __crprint('starting up...');
+            __crprint("starting up...");
 
             var _localStorage = window.localStorage;
             window.crispr = {
-
                 version: {
                     major: 1,
                     minor: 2,
                     revision: 7,
 
-                    toString: function () {
+                    toString: function() {
                         return `v${this.major}.${this.minor}.${this.revision}`;
                     }
                 },
@@ -62,24 +76,17 @@ function evaluate(str, exportsR) {
                     webpackJsonpTransformations: []
                 },
 
-                data: {
-
-                },
+                data: {},
 
                 functions: {
-
                     patch: mod => {
-
                         // make sure it's an array before trying to process it
                         if (Array.isArray(mod)) {
-
                             // iterate over every module
                             __crprint(`processing ${mod.length} modules...`);
                             for (i in mod) {
-
                                 // iterate over the replacement dictionary
                                 snippets.forEach(pair => {
-
                                     // convert the module constructor into a string
                                     var orig = mod[i].toString();
 
@@ -87,87 +94,111 @@ function evaluate(str, exportsR) {
                                     var signature = pair.signature;
 
                                     // check if it's an old shitty regex replacement
-                                    signature = typeof signature == 'string' ? signature.startsWith('/') && signature.endsWith('/') ? new RegExp(signature.substr(1, signature.length - 2)) : signature : signature;
+                                    signature =
+                                        typeof signature == "string"
+                                            ? signature.startsWith("/") &&
+                                              signature.endsWith("/")
+                                              ? new RegExp(
+                                                    signature.substr(
+                                                        1,
+                                                        signature.length - 2
+                                                    )
+                                                )
+                                              : signature
+                                            : signature;
 
                                     // if the constructor contains our signature, patch it
-                                    if (typeof signature == 'string' ? orig.indexOf(signature) != -1 : orig.match(signature)) {
-
+                                    if (
+                                        typeof signature == "string"
+                                            ? orig.indexOf(signature) != -1
+                                            : orig.match(signature)
+                                    ) {
                                         // replace the function with our new one
-                                        __crprint(`patching module ${i}... (${signature})`);
-                                        mod[i] = eval('(' + orig.replace(signature, pair.payload) + ')');
-
+                                        __crprint(
+                                            `patching module ${i}... (${signature})`
+                                        );
+                                        mod[i] = eval(
+                                            "(" +
+                                                orig.replace(
+                                                    signature,
+                                                    pair.payload
+                                                ) +
+                                                ")"
+                                        );
                                     }
-
                                 });
-
                             }
-
                         }
-
                     },
 
                     pushHookOld: (x, mod, main) => {
-
                         // disable safemode keystroke listener
-                        document.removeEventListener('keydown', goSafe);
+                        document.removeEventListener("keydown", goSafe);
 
                         // check if safemode
-                        if (!_localStorage['safemode'])
+                        if (!_localStorage["safemode"])
                             crispr.functions.patch(mod);
 
                         // call webpack proper with our modified modules
                         return crispr.data.webpackPush(x, mod, main);
-
                     },
 
-                    pushHookNew: (x,mod,main) => {
-
+                    pushHookNew: (x, mod, main) => {
                         // disable safemode keystroke listener
-                        document.removeEventListener('keydown', goSafe);
+                        document.removeEventListener("keydown", goSafe);
 
                         // check if safemode
-                        if (!_localStorage['safemode'])
+                        if (!_localStorage["safemode"])
                             crispr.functions.patch(mod);
 
                         // call webpack proper with our modified modules
                         return mod;
-
                     }
-
-                },
-
+                }
             };
 
             // safemode stuff
-            __crprint('press left shift to start up in safemode');
+            __crprint("press left shift to start up in safemode");
 
             function goSafe(e) {
-                if (e.keyCode == 16)
-                    _localStorage['safemode'] = 1;
-                __crwarn('ok, starting up in safe mode');
-                document.removeEventListener('keydown', goSafe);
+                if (e.keyCode == 16) _localStorage["safemode"] = 1;
+                __crwarn("ok, starting up in safe mode");
+                document.removeEventListener("keydown", goSafe);
             }
 
-            document.addEventListener('keydown', goSafe);
-            document.addEventListener('ep-ready', () => document.removeEventListener('keydown', goSafe)); // crispr expects epapi to reset safemode and fire ep-ready
+            document.addEventListener("keydown", goSafe);
+            document.addEventListener("ep-ready", () =>
+                document.removeEventListener("keydown", goSafe)
+            ); // crispr expects epapi to reset safemode and fire ep-ready
 
             // with crxpwn, it's no longer safe to assume we have access to require()
             var electron;
             if (window.DiscordNative !== undefined) {
-                electron = DiscordNative.nativeModules.requireModule("discord_/../electron");
+                electron = DiscordNative.nativeModules.requireModule(
+                    "discord_/../electron"
+                );
                 window.require = electron.remote.require;
-            }
-            else {
-                electron = require('electron');
+            } else {
+                electron = require("electron");
             }
 
             // crispr runs far before epapi is ready, so we need to define these for ourself
-            const fs = require('original-fs');
-            const data = electron.remote.app.getPath('userData');
+            const fs = require("original-fs");
+            const data = electron.remote.app.getPath("userData");
 
             function krequire(p) {
                 var exports = {};
-                eval(fs.readFileSync(data + '/plugins/' + p + (p.endsWith('.js') ? '' : '.js'), 'utf8').toString());
+                eval(
+                    fs
+                        .readFileSync(
+                            data +
+                                "/plugins/" +
+                                p +
+                                (p.endsWith(".js") ? "" : ".js"),
+                            "utf8"
+                        )
+                        .toString()
+                );
                 return exports;
             }
 
@@ -175,44 +206,58 @@ function evaluate(str, exportsR) {
             var snippets = [];
 
             // plugin iterator, taken from epapi
-            if (fs.existsSync(data + '/plugins')) {
-                fs.readdirSync(data + '/plugins').forEach(x => {
-                    if (x.endsWith('.js')) {
+            if (fs.existsSync(data + "/plugins")) {
+                fs.readdirSync(data + "/plugins").forEach(x => {
+                    if (x.endsWith(".js")) {
                         try {
                             var plugin = krequire(x);
                             if (plugin.preload !== undefined) {
-
                                 // plugin has a preload function
-                                __crprint('executing /plugins/' + x);
+                                __crprint("executing /plugins/" + x);
                                 plugin.preload();
-
                             }
                             if (plugin.replacements !== undefined) {
-
                                 // add the plugin's replacements to the dictionary
-                                __crprint('adding replacements from /plugins/' + x);
-                                __crwarn('exports.replacements is deprecated, please use exports.manifest.replacements');
-                                Object.keys(plugin.replacements).map(key => { return { signature: key, payload: plugin.replacements[key] } }).forEach(x => snippets.push(x));
-
+                                __crprint(
+                                    "adding replacements from /plugins/" + x
+                                );
+                                __crwarn(
+                                    "exports.replacements is deprecated, please use exports.manifest.replacements"
+                                );
+                                Object.keys(plugin.replacements)
+                                    .map(key => {
+                                        return {
+                                            signature: key,
+                                            payload: plugin.replacements[key]
+                                        };
+                                    })
+                                    .forEach(x => snippets.push(x));
                             }
-                            if (plugin.manifest !== undefined && plugin.manifest.replacements !== undefined) {
-
+                            if (
+                                plugin.manifest !== undefined &&
+                                plugin.manifest.replacements !== undefined
+                            ) {
                                 // add the plugin's replacements to the dictionary
-                                __crprint('adding replacements from /plugins/' + x);
-                                plugin.manifest.replacements.forEach(x => snippets.push(x));
-
+                                __crprint(
+                                    "adding replacements from /plugins/" + x
+                                );
+                                plugin.manifest.replacements.forEach(x =>
+                                    snippets.push(x)
+                                );
                             }
                         } catch (e) {
-                            console.warn('/plugins/' + x + ' contains errors\n\n', e);
+                            console.warn(
+                                "/plugins/" + x + " contains errors\n\n",
+                                e
+                            );
                         }
                     }
                 });
             }
 
             // hook webpackJsonp so that we can play with the constructors
-            __crprint('hooking webpackJsonp...');
+            __crprint("hooking webpackJsonp...");
             Object.defineProperty(window, "webpackJsonp", {
-
                 // return crispr's function instead of webpack proper
                 get: () => window.crispr.hook,
 
@@ -224,21 +269,26 @@ function evaluate(str, exportsR) {
                     //__crprint('something is trying to define webpackJsonp...');
 
                     window.crispr.webpackJsonp = webpack;
-                    if (typeof webpack == 'function') {
+                    if (typeof webpack == "function") {
                         window.crispr.data.webpackPush = webpack;
-                        window.crispr.hook = window.crispr.functions.pushHookOld;
+                        window.crispr.hook =
+                            window.crispr.functions.pushHookOld;
                     } else {
-                        const newPush = function(e,t,o){
+                        const newPush = function(e, t, o) {
                             const modules = t || e[1];
                             const main = o ? o : e[2];
                             const _ = t ? e : e[0];
 
-                            const patched = window.crispr.functions.pushHookNew(_,modules,main);
+                            const patched = window.crispr.functions.pushHookNew(
+                                _,
+                                modules,
+                                main
+                            );
 
-                            const args = [_,patched,main];
+                            const args = [_, patched, main];
 
-                            push_original.apply(webpack, [args])
-                        }
+                            push_original.apply(webpack, [args]);
+                        };
 
                         webpack.push = newPush;
                         window.crispr.hook = webpack;
@@ -247,13 +297,10 @@ function evaluate(str, exportsR) {
                 }
             });
 
-            __crprint('ready!');
-
+            __crprint("ready!");
         } catch (ex) {
             // something bad happened -- if we dont catch this exception it will break discord!!!
-            console.error('CRISPR init failure!\n\n', ex);
+            console.error("CRISPR init failure!\n\n", ex);
         }
-
-    });
-
+    };
 })();

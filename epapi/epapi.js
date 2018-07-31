@@ -329,11 +329,7 @@ function evaluate(str, exportsR) {
 
         // set everything up and load plugins
         init: function() {
-            if (
-                $(".guilds-wrapper .guilds") != null
-                    ? $(".guilds-wrapper .guilds").children.length > 0
-                    : 0
-            ) {
+            if ($(".app") != null ? $(".app").children.length > 0 : 0) {
                 try {
                     if (exports.localStorage.get("safemode")) {
                         internal.print(
